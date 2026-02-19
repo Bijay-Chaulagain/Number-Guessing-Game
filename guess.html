@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 5px solid #764ba2;
+            counter-increment: section;
+        }
+
+        h2::before {
+            content: counter(section) ". ";
+            font-weight: bold;
+        }
+
+        h3 {
+            color: #495057;
+            margin-top: 20px;
+            counter-increment: subsection;
+        }
+
+        h3::before {
+            content: counter(section) "." counter(subsection) " ";
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border: 2px solid #dee2e6;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .toc h2::before {
+            content: "";
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            padding-left: 10px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 5px solid #667eea;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .game-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            color: white;
+            text-align: center;
+        }
+
+        .game-container h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .game-container h3::before {
+            content: "";
+        }
+
+        #gameArea {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        input[type="number"] {
+            padding: 12px 20px;
+            font-size: 18px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            width: 200px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeeba;
+        }
+
+        #stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        #guessHistory {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 50px;
+        }
+
+        .guess-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .concept {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* Reset counters */
+        body {
+            counter-reset: section;
+        }
+
+        h2 {
+            counter-reset: subsection;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- Section 3: Game Demo -->
+        <h2 id="game-demo">Live Game Demo</h2>
+        <div class="game-container">
+            <h3>🎯 Try the Game!</h3>
+            <div id="gameArea">
+                <h2 style="color: #667eea; margin-top: 0;">Guess the Number (1-100)</h2>
+                <div id="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Attempts</div>
+                        <div class="stat-value" id="attempts">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Best Score</div>
+                        <div class="stat-value" id="bestScore">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Games Played</div>
+                        <div class="stat-value" id="gamesPlayed">0</div>
+                    </div>
+                </div>
+
+                <div id="message" class="info">Make your first guess!</div>
+
+                <div>
+                    <input type="number" id="guessInput" min="1" max="100" placeholder="Enter 1-100">
+                </div>
+
+                <div>
+                    <button id="submitGuess">Submit Guess</button>
+                    <button id="resetGame">New Game</button>
+                    <button id="clearStats">Clear Stats</button>
+                </div>
+
+                <div id="guessHistory">
+                    <strong>Your Guesses:</strong> <span id="historyList">None yet</span>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    // ==================== GLOBAL VARIABLES ====================
+    let secretNumber;
+    let attempts;
+    let guessHistory;
+    let bestScore;
+    let gamesPlayed;
+
+    // ==================== INITIALIZATION ====================
+    $(document).ready(function () {
+        loadGameData();
+        initializeGame();
+        setupEventListeners();
+    });
+
+    // ==================== GAME FUNCTIONS ====================
+
+    // function initializeGame() {
+    //     secretNumber = Math.floor(Math.random() * 100) + 1;
+    //     attempts = 0;
+    //     guessHistory = [];
+    //     updateDisplay();
+    //     $('#guessInput').val('').focus();
+    //     $('#guessInput').prop('disabled', false);
+    //     $('#submitGuess').prop('disabled', false);
+    //     showMessage('Make your first guess!', 'info');
+    // }
+
+    function initializeGame() {
+
+        // Check if secret number already exists in sessionStorage
+        const storedSecret = sessionStorage.getItem('secretNumber');
+
+        //set secret number in session storage
+        if (storedSecret) {
+            secretNumber = parseInt(storedSecret);
+        } else {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            sessionStorage.setItem('secretNumber', secretNumber);
+        }
+
+        attempts = 0;
+        guessHistory = [];
+
+        updateDisplay();
+
+        $('#guessInput').val('').focus();
+        $('#guessInput').prop('disabled', false);
+        $('#submitGuess').prop('disabled', false);
+
+        showMessage('Make your first guess!', 'info');
+    }
+
+
+    function checkGuess() {
+        const guess = parseInt($('#guessInput').val());
+
+        if (isNaN(guess)) {
+            showMessage('Please enter a valid number!', 'error');
+            return;
+        }
+
+        if (guess < 1 || guess > 100) {
+            showMessage('Number must be between 1 and 100!', 'warning');
+            return;
+        }
+
+        if (guessHistory.includes(guess)) {
+            showMessage('You already guessed ' + guess + '!', 'warning');
+            return;
+        }
+
+        attempts++;
+        guessHistory.push(guess);
+
+        if (guess === secretNumber) {
+            handleWin();
+        } else if (guess < secretNumber) {
+            showMessage('📉 Too low! Try higher.', 'warning');
+        } else {
+            showMessage('📈 Too high! Try lower.', 'warning');
+        }
+
+        updateDisplay();
+        $('#guessInput').val('').focus();
+    }
+
+    function handleWin() {
+        showMessage('🎉 You won in ' + attempts + ' attempts!', 'success');
+        gamesPlayed++;
+
+        if (bestScore === null || attempts < bestScore) {
+            bestScore = attempts;
+        }
+
+        saveGameData();
+        //removing data from session
+        sessionStorage.removeItem('secretNumber');
+
+        updateDisplay();
+        $('#guessInput').prop('disabled', true);
+        $('#submitGuess').prop('disabled', true);
+    }
+
+    // ==================== SESSION STORAGE ====================
+
+    function saveGameData() {
+        sessionStorage.setItem('bestScore', bestScore);
+        sessionStorage.setItem('gamesPlayed', gamesPlayed);
+    }
+
+    function loadGameData() {
+        bestScore = sessionStorage.getItem('bestScore');
+        gamesPlayed = sessionStorage.getItem('gamesPlayed');
+        bestScore = bestScore ? parseInt(bestScore) : null;
+        gamesPlayed = gamesPlayed ? parseInt(gamesPlayed) : 0;
+    }
+
+    function clearStatistics() {
+        if (confirm('Clear all statistics?')) {
+            //changed
+            sessionStorage.clear();
+            secretNumber=null;
+            attempts=0;
+            guessHistory=[];
+            bestScore = null;
+            gamesPlayed = 0;
+            updateDisplay();
+            showMessage('Statistics cleared!', 'info');
+
+            //start new game
+            initializeGame();
+        }
+    }
+
+    // ==================== DISPLAY FUNCTIONS ====================
+
+    function updateDisplay() {
+        $('#attempts').text(attempts);
+        $('#bestScore').text(bestScore !== null ? bestScore : '-');
+        $('#gamesPlayed').text(gamesPlayed);
+        displayGuessHistory();
+    }
+
+    function displayGuessHistory() {
+        if (guessHistory.length === 0) {
+            $('#historyList').text('None yet');
+            return;
+        }
+
+        let historyHTML = '';
+        for (let i = 0; i < guessHistory.length; i++) {
+            historyHTML += '<span class="guess-item">' + guessHistory[i] + '</span>';
+        }
+        $('#historyList').html(historyHTML);
+    }
+
+    function showMessage(text, type) {
+        const $message = $('#message');
+        $message.removeClass('success error info warning');
+        $message.addClass(type).text(text);
+    }
+
+    // ==================== EVENT HANDLERS ====================
+
+    function setupEventListeners() {
+        $('#submitGuess').click(function () {
+            checkGuess();
+        });
+
+        $('#guessInput').keypress(function (event) {
+            if (event.which === 13) {
+                checkGuess();
+            }
+        });
+
+        $('#resetGame').click(function () {
+            initializeGame();
+        });
+
+        $('#clearStats').click(function () {
+            clearStatistics();
+        });
+    }
+</script>
+
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Guessing Game</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 400px;
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    width: 200px;
+    margin: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+#message {
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.stat-box {
+    margin: 10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Guess the Number (1-100)</h2>
+
+    <div class="stat-box">Attempts: <span id="attempts">0</span></div>
+    <div class="stat-box">Best Score: <span id="bestScore">-</span></div>
+    <div class="stat-box">Games Played: <span id="gamesPlayed">0</span></div>
+
+    <div id="message">Make your first guess!</div>
+
+    <input type="number" id="guessInput" min="1" max="100" placeholder="Enter 1-100">
+    <br>
+    <button id="submitGuess">Submit Guess</button>
+    <button id="resetGame">New Game</button>
+    <button id="clearStats">Clear Stats</button>
+
+    <div>
+        <strong>Guess History:</strong>
+        <div id="historyList">None yet</div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+
+// ================= GLOBAL VARIABLES =================
+let secretNumber;
+let attempts;
+let guessHistory;
+let bestScore;
+let gamesPlayed;
+
+// ================= INITIALIZATION =================
+$(document).ready(function () {
+    loadGameData();
+    initializeGame();
+    setupEventListeners();
+});
+
+// ================= GAME FUNCTIONS =================
+function initializeGame() {
+
+    // Restore or generate secret number
+    const storedSecret = sessionStorage.getItem('secretNumber');
+
+    if (storedSecret) {
+        secretNumber = parseInt(storedSecret);
+    } else {
+        secretNumber = Math.floor(Math.random() * 100) + 1;
+        sessionStorage.setItem('secretNumber', secretNumber);
+    }
+
+    attempts = 0;
+    guessHistory = [];
+
+    updateDisplay();
+
+    $('#guessInput').val('').prop('disabled', false).focus();
+    $('#submitGuess').prop('disabled', false);
+
+    showMessage("Make your first guess!");
+}
+
+function checkGuess() {
+
+    const guess = parseInt($('#guessInput').val());
+
+    if (isNaN(guess)) {
+        showMessage("Please enter a valid number!");
+        return;
+    }
+
+    if (guess < 1 || guess > 100) {
+        showMessage("Number must be between 1 and 100!");
+        return;
+    }
+
+    if (guessHistory.includes(guess)) {
+        showMessage("You already guessed that number!");
+        return;
+    }
+
+    attempts++;
+    guessHistory.push(guess);
+
+    if (guess === secretNumber) {
+        handleWin();
+        return;
+    }
+
+    if (guess < secretNumber) {
+        showMessage("Too low! Try higher.");
+    } else {
+        showMessage("Too high! Try lower.");
+    }
+
+    updateDisplay();
+    $('#guessInput').val('').focus();
+}
+
+function handleWin() {
+
+    showMessage("🎉 You won in " + attempts + " attempts!");
+    gamesPlayed++;
+
+    if (bestScore === null || attempts < bestScore) {
+        bestScore = attempts;
+    }
+
+    saveGameData();
+
+    // Remove secret number after win
+    sessionStorage.removeItem('secretNumber');
+
+    updateDisplay();
+
+    $('#guessInput').prop('disabled', true);
+    $('#submitGuess').prop('disabled', true);
+}
+
+// ================= STORAGE FUNCTIONS =================
+function saveGameData() {
+    sessionStorage.setItem('bestScore', bestScore);
+    sessionStorage.setItem('gamesPlayed', gamesPlayed);
+}
+
+function loadGameData() {
+    bestScore = sessionStorage.getItem('bestScore');
+    gamesPlayed = sessionStorage.getItem('gamesPlayed');
+
+    bestScore = bestScore ? parseInt(bestScore) : null;
+    gamesPlayed = gamesPlayed ? parseInt(gamesPlayed) : 0;
+}
+
+function clearStatistics() {
+
+    if (confirm("Clear all statistics and reset game?")) {
+
+        // Clear ALL session data
+        sessionStorage.clear();
+
+        // Reset variables
+        secretNumber = null;
+        attempts = 0;
+        guessHistory = [];
+        bestScore = null;
+        gamesPlayed = 0;
+
+        updateDisplay();
+        showMessage("All statistics cleared!");
+
+        // Start fresh game
+        initializeGame();
+    }
+}
+
+// ================= DISPLAY FUNCTIONS =================
+function updateDisplay() {
+
+    $('#attempts').text(attempts);
+    $('#bestScore').text(bestScore !== null ? bestScore : '-');
+    $('#gamesPlayed').text(gamesPlayed);
+
+    if (guessHistory.length === 0) {
+        $('#historyList').text("None yet");
+    } else {
+        $('#historyList').text(guessHistory.join(", "));
+    }
+}
+
+function showMessage(text) {
+    $('#message').text(text);
+}
+
+// ================= EVENT LISTENERS =================
+function setupEventListeners() {
+
+    $('#submitGuess').click(checkGuess);
+
+    $('#guessInput').keypress(function (event) {
+        if (event.which === 13) {
+            checkGuess();
+        }
+    });
+
+    $('#resetGame').click(function () {
+        sessionStorage.removeItem('secretNumber');
+        initializeGame();
+    });
+
+    $('#clearStats').click(clearStatistics);
+}
+
+</script>
+
+</body>
+</html>
